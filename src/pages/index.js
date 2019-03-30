@@ -11,7 +11,7 @@ import { withStyles } from '@material-ui/core/styles';
 import withRoot from '../withRoot';
 import {BrowserRouter as Router, Link, Redirect } from 'react-router-dom';
 import Route from 'react-router-dom/Route';
-import { connectP1, connectP2, connectP3, connectP4, setUser } from './client';
+import { setUser, update } from './client';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -60,41 +60,17 @@ function ListItemLink(props) {
 
 class Index extends React.Component {
   constructor(props) {
-    super(props);
-
-    if (this.state.player1 != 'Player 1 has joined the lobby') {
-      connectP1((err, player1) => this.setState({ 
-        player1
-      })); 
-    }
-    if (this.state.player2 != 'Player 2 has joined the lobby') {
-      connectP2((err, player2) => this.setState({ 
-        player2
-      })); 
-    } 
-    else if (this.state.player3 != 'Player 3 has joined the lobby'){
-      connectP3((err, player3) => this.setState({ 
-        player3
-      })); 
-    }
-    else if (this.state.player4 != 'Player 4 has joined the lobby') {
-      connectP4((err, player4) => this.setState({ 
-        player4
-      }));  
-    }  
+    super(props);  
   }
 
   state = {
     open: false,
     redirect: false,
-    player1: "Waiting for Player 1",
-    player2: "Waiting for Player 2",
-    player3: "Waiting for Player 3",
-    player4: "Waiting for Player 4",
     user: "",
     lobby: false,
     inLobby: false,
-    connectedUsers: []
+    connectedUsers: [],
+    length: 0
   };
 
 
@@ -108,14 +84,14 @@ class Index extends React.Component {
 	handleSubmit = (e)=>{
     e.preventDefault();
     if (this.state.lobby === false && this.state.connectedUsers.length < 4) {
-    setUser(this.state.user, (err, lobby, connectedUsers) =>  this.setState({ 
-      lobby, connectedUsers
+    setUser(this.state.user, (err, lobby, connectedUsers, length) =>  this.setState({ 
+      lobby, connectedUsers, length
     }));
   }
   }
 
   handleChange = (e)=>{
-		this.setState({user:e.target.value})
+		this.setState({user:e.target.value});
   }
 
   render() { 
@@ -126,6 +102,8 @@ class Index extends React.Component {
       return <Router><Redirect to='/lobby/' /></Router>
     }
 
+    update(this);
+
     return (
     	<Router>
       <Route path='/' exact strict render={
@@ -133,7 +111,7 @@ class Index extends React.Component {
           <div>
       <div className={classes.root}>
       <p className="App-intro">
-      This is the timer value: {this.state.timestamp}
+      This is the timer value: {this.state.connectedUsers.length}
       </p>
         <Typography variant="h4" gutterBottom>
           Coup
@@ -168,7 +146,7 @@ class Index extends React.Component {
             <div className={classes.list}>
             <List component="nav">
               <ListItem button>
-                <ListItemText primary={this.state.connectedUsers[0]} />
+                <ListItemText primary={this.state.connectedUsers.length} />
               </ListItem>
               <ListItemLink href="#simple-list">
                 <ListItemText primary={this.state.connectedUsers[1]} />
